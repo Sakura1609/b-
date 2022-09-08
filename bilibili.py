@@ -1,14 +1,12 @@
 """
 爬取bilibili
 """
+import pickle
 import time
 import random
-from webbrowser import get
 import requests
 import re
 import json
-
-from scipy import rand
 
 custom_headers = {
     'Accept': '*/*',
@@ -18,6 +16,9 @@ custom_headers = {
     'Connection': 'close'
 }
 
+queue = set()
+passList = set()
+count = 0
 
 def get_dict(bvid: str) -> dict:
     """
@@ -82,10 +83,7 @@ def get_related(dic: dict) -> set:
     return bvList
 
 # 广度优先遍历进行爬取
-def width(bvid: str):
-    count = 0
-    queue = set()
-    passList = set()
+def width(bvid: str, passList: set, queue: set, count: int):
     queue.add(bvid)
     passList.add(bvid)
     with open('result.txt', 'ab') as f:
@@ -100,21 +98,25 @@ def width(bvid: str):
             if child is not None:
                 queue.update(child)
 
+def loadData(file: str):
+    f = open(file, encoding='utf-8')
+    return f.read()
+
 def main():
-    while True:
-        try:
-            source = "BV1JB4y1s7Dk"
-            width(source)
-        except Exception as ex:
-            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-            message = template.format(type(ex).__name__, ex.args)
-            print('\n'+message)
-            break
-        finally:
-            break
+    passList.updata(pickle.load('passList.dat'))
+    queue.updata(pickle.load('queue.dat'))
+    count = pickle.load('count.dat')
+    source = "BV12i4y197hB"
+    width(source, passList, queue, count)
 
     
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except:
+        pickle.dump(passList, 'passList.dat')
+        pickle.dump(queue, 'queue.dat')
+        pickle.dump(count, 'count.dat')
+
