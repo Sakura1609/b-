@@ -40,8 +40,8 @@ def get_dict(bvid: str) -> dict:
     # 将匹配到的字符串转化为python字典
     video_dict = match.group('dict')
     dic = json.loads(video_dict)
-    # 强行让你睡眠一秒, 防止进橘子
-    time.sleep(random.random())
+    # 随机睡眠
+    time.sleep(random.random()/10)
     return dic
 
 def produce_json(dic: dict) -> dict:
@@ -98,15 +98,15 @@ def width(bvid: str, passList: set, queue: set, count: int):
             if child is not None:
                 queue.update(child)
 
-def loadData(file: str):
-    f = open(file, encoding='utf-8')
-    return f.read()
 
 def main():
-    passList.updata(pickle.load('passList.dat'))
-    queue.updata(pickle.load('queue.dat'))
-    count = pickle.load('count.dat')
-    source = "BV12i4y197hB"
+    with open('passList.dat', 'rb') as f1:
+        passList.update(pickle.load(f1))
+    with open('queue.dat', 'rb') as f2:
+        queue.update(pickle.load(f2))
+    with open('count.dat', 'rb') as f3:
+        count = pickle.load(f3)
+    source = "BV1JB4y1s7Dk"
     width(source, passList, queue, count)
 
     
@@ -116,7 +116,10 @@ if __name__ == '__main__':
     try:
         main()
     except:
-        pickle.dump(passList, 'passList.dat')
-        pickle.dump(queue, 'queue.dat')
-        pickle.dump(count, 'count.dat')
+        with open('passList.dat', 'wb') as f1:
+            pickle.dump(passList, f1)
+        with open('queue.dat', 'wb') as f2:
+            pickle.dump(queue, f2)
+        with open('count.dat', 'wb') as f3:
+            pickle.dump(count, f3)
 
