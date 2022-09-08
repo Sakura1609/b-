@@ -41,7 +41,7 @@ def get_dict(bvid: str) -> dict:
     video_dict = match.group('dict')
     dic = json.loads(video_dict)
     # 随机睡眠
-    time.sleep(random.random()/10)
+    time.sleep(random.random()/2)
     return dic
 
 def produce_json(dic: dict) -> dict:
@@ -55,6 +55,7 @@ def produce_json(dic: dict) -> dict:
         for tag in dic['tags']:
             data['tags'].append(tag['tag_name'])
     except KeyError as e:
+        print("produce_json failed")
         data = {
             'bvid': '',
             'title': '',
@@ -79,14 +80,16 @@ def get_related(dic: dict) -> set:
         for item in dic['related']:
             bvList.append(item['bvid'])
     except KeyError as e:
+        print("get_related failed")
         pass
     return bvList
 
 # 广度优先遍历进行爬取
 def width(bvid: str, passList: set, queue: set, count: int):
-    queue.add(bvid)
-    passList.add(bvid)
-    with open('result.txt', 'ab') as f:
+    if len(queue) == 0:
+        queue.add(bvid)
+        passList.add(bvid)
+    with open('result_2.txt', 'ab') as f:
         while queue and count < 300000:
             bvid = queue.pop()
             passList.add(bvid)
@@ -95,7 +98,7 @@ def width(bvid: str, passList: set, queue: set, count: int):
             f.write(',\n'.encode('utf-8'))
             count = count + 1
             child = set(get_related(dic)).difference(passList)
-            if child is not None:
+            if len(child) != 0:
                 queue.update(child)
 
 
@@ -116,6 +119,7 @@ if __name__ == '__main__':
     try:
         main()
     except:
+        print("interupted")
         with open('passList.dat', 'wb') as f1:
             pickle.dump(passList, f1)
         with open('queue.dat', 'wb') as f2:
